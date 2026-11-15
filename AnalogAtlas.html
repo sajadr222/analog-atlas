@@ -471,6 +471,10 @@ html[dir="rtl"] .ibar{transform:scaleX(-1)}
 .facts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.facts div{display:flex;flex-direction:column;gap:2px}.facts b{font-size:15px}
 #step3 .cards{grid-template-columns:repeat(auto-fill,minmax(420px,1fr))}
 @media (max-width:600px){#step3 .cards{grid-template-columns:1fr}.imp{grid-template-columns:1fr 80px;}.imp .iv{grid-column:1/-1}}
+
+.knote{background:#F1ECF9;border-inline-start:4px solid #7653A6;border-radius:8px;padding:8px 10px;color:#3A3F6E;margin:8px 0}
+.top1{display:inline-block;background:linear-gradient(90deg,#7653A6,#F16A4A);color:#fff;font-size:12px;font-weight:800;border-radius:999px;padding:2px 8px;vertical-align:middle;margin-inline-start:6px}
+.concl h3{font-size:20px;margin-bottom:10px}.concl p{line-height:1.65;margin:0 0 10px;color:#14173A}.concl p:last-child{margin-bottom:0;color:#3A3F6E}
 </style>
 </head>
 <body>
@@ -529,6 +533,11 @@ html[dir="rtl"] .ibar{transform:scaleX(-1)}
   <section class="show sp" id="step3">
     <div class="stephead"><i>3</i><div><h2 data-t="s3"></h2><p class="dim" data-t="s3p"></p></div></div>
     <div class="cards" id="cards"></div>
+  </section>
+
+  <section class="show sp" id="conclusion">
+    <div class="stephead"><i>★</i><div><h2 data-t="concl_t"></h2></div></div>
+    <div class="panel concl" id="concl"></div>
   </section>
 
   <section class="show sp" id="about">
@@ -679,7 +688,7 @@ const T = {
     s2: 'The model\'s map of Earth', s2p: 'Earth split into {deg}° squares. Click any square to see why it got its score.',
     s3: 'Top new places', s3p: 'The best places the model found that are not NASA sites yet.',
     v_world: 'World', v_region: 'Our region',
-    hi: 'Very like Mars', mid: 'A bit like Mars', lo: 'Not like Mars',
+    hi: 'Similar to known Mars analogs', mid: 'A bit like Mars', lo: 'Not like Mars',
     known: 'NASA test site', candidate: 'New place',
     read_nasa: 'Read on NASA', worldview: 'See it from NASA satellites', details: 'Why?', close: 'Close', onmap: 'Show on map',
     score_here: 'Model score here', score: 'Mars score', raw: 'score',
@@ -705,7 +714,17 @@ const T = {
     team: 'For the team', team_p: 'Load a new results.json from the model here. The whole page updates.',
     ld_btn: 'Load model results', ld_ok: 'Loaded', ld_sites: 'squares', ld_bad: 'This file is missing:', ld_json: 'Not a valid JSON file:',
     team_data: 'Files used:', foot: 'Mars score = similarity to known Mars-analog sites, not a measured fact.',
-    approx: 'approx.'
+    approx: 'approx.',
+    hidden_t: 'Checked when hidden', hidden_p: 'We hid this site from the model. It still ranked it correctly. (0.5 = guessing, 1.0 = perfect)',
+    known_note: 'The model learned from this site, so this score is not a test.',
+    dv_note: 'The 3° square around Death Valley is centred in the mountains to the west (about 1,500 m high, about 470 mm of rain a year, green with plants), so its map score is low. Death Valley itself is a dry basin. This shows the limit of a 3° grid.',
+    concl_t: 'Conclusion',
+    concl_h: 'Conclusion: where on Earth looks most like Mars?',
+    concl_1: 'Among places that are not already NASA test sites, our model ranks Central Iran (about 33°N, 55.5°E) closest to Mars, with a score of 0.96.',
+    concl_2: 'Three things pushed the score up most: very little rain (about 107 mm a year), almost no plants (NDVI 0.08), and slopes close to the known Mars-analog sites (about 3°). The area sits at about 1,360 m.',
+    concl_3: 'Like Atacama and Death Valley, it is much warmer than Mars (average surface temperature about 25 °C), so the match is about dryness and landscape, not temperature.',
+    concl_4: 'Runners-up: Southern Namibia (0.90), Northern Chad (0.89), Southern Iran (0.84), North-central Iran (0.83).',
+    concl_5: 'This is a candidate for scientists to study, not a confirmed Mars analog. Next steps: a finer grid, the Moon, and direct Mars data.'
   },
   ar: {
     tagline: 'منلاقي المريخ على الأرض', nav1: 'مواقع ناسا', nav2: 'الخريطة', nav3: 'أفضل الأماكن', nav4: 'كيف بيشتغل', lang: 'English',
@@ -717,7 +736,7 @@ const T = {
     s2: 'خريطة الموديل للأرض', s2p: 'قسمنا الأرض لمربعات {deg}°. اكبس على أي مربع لتعرف ليش أخذ هالنتيجة.',
     s3: 'أفضل أماكن جديدة', s3p: 'أحسن أماكن لقاها الموديل ولسا مش مواقع لناسا.',
     v_world: 'العالم', v_region: 'منطقتنا',
-    hi: 'بيشبه المريخ كثير', mid: 'بيشبه المريخ شوي', lo: 'ما بيشبه المريخ',
+    hi: 'بيشبه مواقع المريخ المعروفة', mid: 'بيشبه المريخ شوي', lo: 'ما بيشبه المريخ',
     known: 'موقع تجارب لناسا', candidate: 'مكان جديد',
     read_nasa: 'اقرأ عند ناسا', worldview: 'شوفه من أقمار ناسا', details: 'ليش؟', close: 'سكّر', onmap: 'وريني عالخريطة',
     score_here: 'نتيجة الموديل هون', score: 'نتيجة المريخ', raw: 'النتيجة',
@@ -743,7 +762,17 @@ const T = {
     team: 'للفريق', team_p: 'حمّلوا ملف results.json جديد من الموديل من هون، وكل الصفحة بتتحدّث.',
     ld_btn: 'حمّل نتائج الموديل', ld_ok: 'تم تحميل', ld_sites: 'مربع', ld_bad: 'الملف ناقصه:', ld_json: 'هاد مش ملف JSON صالح:',
     team_data: 'الملفات المستخدمة:', foot: 'نتيجة المريخ = قديش المكان بيشبه مواقع المريخ المعروفة، مش قياس مباشر.',
-    approx: 'تقريباً'
+    approx: 'تقريباً',
+    hidden_t: 'الفحص وهو مخفي', hidden_p: 'خبّينا هاد الموقع عن الموديل، وبرضو رتّبه صح. (0.5 = تخمين، 1.0 = مثالي)',
+    known_note: 'الموديل تعلّم من هاد الموقع، فهاي النتيجة مش اختبار.',
+    dv_note: 'مربع الـ 3° حوالين وادي الموت مركزه بالجبال اللي غربه (ارتفاع حوالي 1,500 م، وحوالي 470 مم مطر بالسنة، وأخضر بالنباتات)، فنتيجته على الخريطة منخفضة. وادي الموت نفسه حوض جاف. هاد بيبيّن حدود شبكة الـ 3°.',
+    concl_t: 'الخلاصة',
+    concl_h: 'الخلاصة: وين على الأرض أكثر مكان بيشبه المريخ؟',
+    concl_1: 'من بين الأماكن اللي مش أصلاً مواقع تجارب لناسا، الموديل تبعنا بيعتبر وسط إيران (حوالي 33°N، 55.5°E) الأقرب للمريخ، بنتيجة 0.96.',
+    concl_2: 'أكثر ثلاث أشياء رفعت النتيجة: مطر قليل كثير (حوالي 107 مم بالسنة)، وتقريباً ما في نباتات (NDVI 0.08)، وانحدار قريب من مواقع المريخ المعروفة (حوالي 3°). المنطقة على ارتفاع حوالي 1,360 م.',
+    concl_3: 'متل أتاكاما ووادي الموت، هي أدفى بكثير من المريخ (متوسط حرارة السطح حوالي 25 °C)، فالشبه هو بالجفاف وشكل الأرض، مش بالحرارة.',
+    concl_4: 'اللي بعدها: جنوب ناميبيا (0.90)، شمال تشاد (0.89)، جنوب إيران (0.84)، شمال وسط إيران (0.83).',
+    concl_5: 'هاد مكان مرشّح للعلماء يدرسوه، مش موقع محاكاة للمريخ مؤكد. الخطوات الجاية: شبكة أدق، والقمر، وبيانات مباشرة من المريخ.'
   }
 };
 let LANG = 'en';
@@ -787,8 +816,8 @@ function followEyes(e) {
 /* ===================== data ===================== */
 let ML = null;           // { results, candidates, known, features, importance }
 const KINFO = {"atacama": {"name_en": "Atacama Desert (Yungay)", "name_ar": "صحراء أتاكاما (يونغاي)", "region_en": "Chile", "region_ar": "تشيلي", "url": "https://www.nasa.gov/universe/atacama-rover-astrobiology-drilling-studies-arads/", "title": "Atacama Rover Astrobiology Drilling Studies (ARADS)", "summary_en": "One of the driest places on Earth: some spots get about 1 cm of rain in ten years. NASA's ARADS team tested a rover with a 2-metre drill here from 2016 to 2019, because the dryness and soil chemistry are close to Mars.", "summary_ar": "من أجفّ الأماكن على الأرض: بعض المناطق بينزل فيها حوالي 1 سم مطر بعشر سنين. فريق ARADS التابع لناسا جرّب هون روفر مع مثقب طوله 2 متر بين 2016 و2019، لأنه الجفاف وكيمياء التربة قريبين من المريخ."}, "haughton": {"name_en": "Haughton Crater, Devon Island", "name_ar": "فوهة هاوتون، جزيرة ديفون", "region_en": "Nunavut, Canada", "region_ar": "نونافوت، كندا", "url": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/", "title": "10 Things to Know About Planetary Analogs", "summary_en": "An impact crater on the largest uninhabited island on Earth. NASA says its barren ground, freezing cold and isolation mimic Mars, and the crater makes it a good place to practise Mars spacewalks.", "summary_ar": "فوهة نيزكية على أكبر جزيرة غير مسكونة على الأرض. ناسا بتحكي إنه أرضها الجرداء وبردها وعزلتها بتشبه المريخ، والفوهة بتخليها مكان مناسب للتدرّب على المشي بالفضاء على المريخ."}, "dry_valleys": {"name_en": "McMurdo Dry Valleys", "name_ar": "الوديان الجافة (ماكموردو)", "region_en": "Antarctica", "region_ar": "القارة القطبية الجنوبية", "url": "https://science.nasa.gov/earth/earth-observatory/martian-landscape-antarctica-4420/", "title": "Martian Landscape, Antarctica", "summary_en": "NASA Earth Observatory calls them perhaps the most Mars-like landscape on Earth: extremely cold, extremely dry, and mostly free of snow and ice.", "summary_ar": "مرصد الأرض التابع لناسا بيعتبرها يمكن أكثر مكان على الأرض بيشبه المريخ: برد شديد، وجفاف شديد، وتقريباً بدون ثلج أو جليد."}, "death_valley": {"name_en": "Death Valley (Badwater Basin)", "name_ar": "وادي الموت (حوض بادووتر)", "region_en": "California, USA", "region_ar": "كاليفورنيا، أمريكا", "url": "https://earthobservatory.nasa.gov/images/78860/mars-rover-curiosity-on-a-familiar-landscape", "title": "Mars Rover Curiosity on a Familiar Landscape", "summary_en": "Badwater Basin is full of fan-shaped sediment deposits like the one where Curiosity landed in Gale Crater. Both are closed basins where water once left salt flats, and a dark hill there has long been nicknamed 'Mars Hill'.", "summary_ar": "حوض بادووتر مليان رواسب على شكل مروحة زي اللي هبطت عندها كيوريوسيتي بفوهة غيل. الاثنين أحواض مسكّرة كانت المية تترك فيها سهول ملح، وفي تلة غامقة هناك اسمها من زمان «تلة المريخ»."}};
-const CAREA = { '33,55.5': ['Central Iran', 'وسط إيران'], '-27,16.5': ['Southern Namibia', 'جنوب ناميبيا'], '21,16.5': ['Northern Chad (Tibesti)', 'شمال تشاد (تيبستي)'],
-  '27,55.5': ['Southern Iran', 'جنوب إيران'], '36,55.5': ['Northern Iran', 'شمال إيران'] };
+const CAREA = { '33,55.5': ['Central Iran (Yazd Province)', 'وسط إيران (محافظة يزد)'], '-27,16.5': ['Southern Namibia (Karas Region)', 'جنوب ناميبيا (منطقة كاراس)'], '21,16.5': ['Northern Chad (Tibesti)', 'شمال تشاد (تيبستي)'],
+  '27,55.5': ['Southern Iran (Hormozgan Province)', 'جنوب إيران (محافظة هرمزغان)'], '36,55.5': ['North-central Iran', 'شمال وسط إيران'] };
 const st = { view: 'world', cell: null, open: null };
 const HEAT = ['#2E5C9E', '#7653A6', '#F16A4A', '#FF9470'];
 const heat = v => !window.d3 ? '#7653A6' : d3.scaleLinear().domain([0, .5, .75, 1]).range(HEAT).clamp(true)(v);
@@ -846,11 +875,13 @@ function detailHTML(s) {
 }
 
 /* ===================== step 1: NASA sites ===================== */
+const HIDDEN_AUC = { atacama: 0.96, haughton: 0.96, death_valley: 0.94, dry_valleys: 0.87 };
 function renderKnown() {
-  document.getElementById('knowngrid').innerHTML = (ML.known || []).map(k => { const s = knownCell(k), v = s ? s.mars_score : null, I = KINFO[k.id] || {};
-    return '<article class="kcard" style="--c:' + COL[cls(v || 0)] + '"><div class="khead"><span class="kstar" aria-hidden="true">★</span><div><b>' + esc(L(I, 'name') || k.id) + '</b><span>' + esc(L(I, 'region')) + '</span></div></div>' +
+  document.getElementById('knowngrid').innerHTML = (ML.known || []).map(k => { const s = knownCell(k), a = HIDDEN_AUC[k.id], I = KINFO[k.id] || {};
+    return '<article class="kcard" style="--c:' + COL.hi + '"><div class="khead"><span class="kstar" aria-hidden="true">★</span><div><b>' + esc(L(I, 'name') || k.id) + '</b><span>' + esc(L(I, 'region')) + '</span></div></div>' +
       (I.url ? '<p class="small">' + esc(L(I, 'summary')) + '</p>' : '') +
-      '<div class="kscore"><span class="dim small">' + t('score_here') + '</span><b class="num">' + pct(v) + '</b></div><div class="sbar"><i style="width:' + ((v || 0) * 100) + '%"></i></div>' +
+      (a != null ? '<div class="kscore"><span class="dim small">' + t('hidden_t') + '</span><b class="num">AUC ' + a.toFixed(2) + '</b></div><div class="sbar"><i style="width:' + (a * 100) + '%"></i></div><p class="small dim">' + t('hidden_p') + '</p>' : '') +
+      (k.id === 'death_valley' ? '<p class="small knote">' + t('dv_note') + '</p>' : '') +
       '<div class="sact">' + (s ? '<button class="why" data-cell="' + s.site_id + '">' + t('onmap') + '</button>' : '') + (I.url ? ext(I.url, t('read_nasa')) : '') + '</div></article>'; }).join('');
 }
 
@@ -914,7 +945,7 @@ function renderCell() {
   box.className = 'cellpanel'; box.style.setProperty('--c', COL[c]);
   box.innerHTML = '<article class="scard open" id="card-cell" style="--c:' + COL[c] + '"><div class="srow"><div class="sname"><b>' + esc(placeName(s)) + '</b><span>' + ll(s.lat, s.lon) + ' · <span class="tag ' + (s.is_known ? 'known' : 'candidate') + '">' + t(s.is_known ? 'known' : 'candidate') + '</span></span></div>' +
     '<div class="sscore"><b class="num">' + pct(s.mars_score) + '</b><span>' + t(c) + ' · ' + t('raw') + ' ' + s.mars_score + '</span></div></div>' +
-    '<div class="sbar"><i style="width:' + (s.mars_score * 100) + '%"></i></div>' + detailHTML(s) +
+    '<div class="sbar"><i style="width:' + (s.mars_score * 100) + '%"></i></div>' + detailHTML(s) + (s.is_known ? '<p class="small knote">' + t('known_note') + '</p>' : '') +
     '<div class="sact">' + ext(wv(s.lat, s.lon), t('worldview')) + '</div></article>';
 }
 function pickCell(id, fromList) {
@@ -928,7 +959,7 @@ function pickCell(id, fromList) {
 function renderCands() {
   document.getElementById('cards').innerHTML = (ML.candidates || []).map((c, i) => { const s = nearest(c.lat, c.lon), id = 'c' + (i + 1), open = st.open === id, k = cls(c.mars_score);
     return '<article class="scard' + (open ? ' open' : '') + '" id="card-' + id + '" style="--c:' + COL[k] + '">' +
-      '<div class="srow"><span class="rank num">' + (i + 1) + '</span><div class="sname"><b>' + esc(placeName(s)) + '</b><span>' + ll(c.lat, c.lon) + ' · <span class="tag candidate">' + t('candidate') + '</span></span></div>' +
+      '<div class="srow"><span class="rank num">' + (i + 1) + '</span><div class="sname"><b>' + esc(placeName(s)) + (i === 0 ? ' <span class="top1">#1</span>' : '') + '</b><span>' + ll(c.lat, c.lon) + ' · <span class="tag candidate">' + t('candidate') + '</span></span></div>' +
       '<div class="sscore"><b class="num">' + pct(c.mars_score) + '</b><span>' + t(k) + '</span></div></div>' +
       '<div class="sbar"><i style="width:' + (c.mars_score * 100) + '%"></i></div>' +
       '<div class="sact"><button class="why" data-open="' + id + '" aria-expanded="' + open + '">' + (open ? t('close') : t('details')) + '</button>' +
@@ -939,6 +970,9 @@ function renderCands() {
 function bindCells() { document.querySelectorAll('[data-cell]').forEach(b => b.onclick = () => pickCell(b.dataset.cell, true)); }
 
 /* ===================== about ===================== */
+function renderConcl() {
+  document.getElementById('concl').innerHTML = '<h3>' + esc(t('concl_h')) + '</h3>' + ['concl_1', 'concl_2', 'concl_3', 'concl_4', 'concl_5'].map(k => '<p>' + esc(t(k)) + '</p>').join('');
+}
 function renderAbout() {
   const m = ML.results.meta, fs = ML.features || m.features || [];
   const o = { n: (ML.known || []).length, nf: fs.length, deg: deg(), feats: fs.map(fname).join(LANG === 'ar' ? '، ' : ', '), model: m.model || '' };
@@ -1079,7 +1113,7 @@ function setupLoader() {
 function scrollToId(id) { const el = document.getElementById(id); if (!el) return; const y = el.getBoundingClientRect().top + window.pageYOffset - 70; try { window.scrollTo({ top: y, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, y); } }
 function renderAll() {
   document.getElementById('s2p').textContent = fill(t('s2p'), { deg: deg() });
-  legend(); renderKnown(); renderCell(); drawMap(); renderCands(); renderAbout(); bindCells();
+  legend(); renderKnown(); renderCell(); drawMap(); renderCands(); renderConcl(); renderAbout(); bindCells();
 }
 function applyLang() {
   document.documentElement.lang = LANG; document.documentElement.dir = LANG === 'ar' ? 'rtl' : 'ltr';
