@@ -791,7 +791,7 @@ const CAREA = { '33,55.5': ['Central Iran', 'وسط إيران'], '-27,16.5': ['
   '27,55.5': ['Southern Iran', 'جنوب إيران'], '36,55.5': ['Northern Iran', 'شمال إيران'] };
 const st = { view: 'world', cell: null, open: null };
 const HEAT = ['#2E5C9E', '#7653A6', '#F16A4A', '#FF9470'];
-const heat = v => d3.scaleLinear().domain([0, .5, .75, 1]).range(HEAT).clamp(true)(v);
+const heat = v => !window.d3 ? '#7653A6' : d3.scaleLinear().domain([0, .5, .75, 1]).range(HEAT).clamp(true)(v);
 const COL = { hi: '#F16A4A', mid: '#7653A6', lo: '#4D83C5' };
 const cls = v => v >= .75 ? 'hi' : v >= .5 ? 'mid' : 'lo';
 const pct = v => v == null ? '—' : Math.round(v * 100) + '%';
@@ -872,6 +872,7 @@ function legend() {
     '<span class="lk"><i class="kstar">★</i>' + t('known') + '</span><span class="lk"><i class="cnum">1</i>' + t('candidate') + '</span>';
 }
 function drawMap() {
+  if (!window.d3 || !land110) return;
   const svg = d3.select('#map'); svg.selectAll('*').remove();
   const W = svg.node().clientWidth, H = svg.node().clientHeight; if (!W) return;
   const root = svg.append('g'), reg = st.view === 'region', h = deg() / 2;
@@ -1093,7 +1094,7 @@ async function boot() {
   const E = window.AA_DATA || {};
   const [r, c, k, f, i] = await Promise.all(['results.json', 'candidates.json', 'known_sites.json', 'feature_names.json', 'feature_importance.json'].map(getJSON));
   ML = { results: r || E.results, candidates: c || E.candidates, known: k || E.known_sites, features: f || E.feature_names, importance: i || E.feature_importance };
-  prepLand();
+  try { prepLand(); } catch (e) { console.error('map files missing', e); }
   document.addEventListener('click', e => { const a = e.target.closest('[data-scroll]'); if (a) { e.preventDefault(); a.dataset.scroll === 'top' ? window.scrollTo(0, 0) : scrollToId(a.dataset.scroll); } });
   document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => { st.view = b.dataset.view; document.querySelectorAll('[data-view]').forEach(x => x.classList.toggle('on', x === b)); drawMap(); });
   document.getElementById('langBtn').onclick = () => { LANG = LANG === 'en' ? 'ar' : 'en'; try { localStorage.setItem('aa_lang', LANG); } catch (e) {} applyLang(); };
