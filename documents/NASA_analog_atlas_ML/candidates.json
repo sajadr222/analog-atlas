@@ -1,0 +1,62 @@
+[
+  {
+    "lat": 33,
+    "lon": 55.5,
+    "mars_score": 0.962,
+    "elevation": 1357.424,
+    "slope": 3.163,
+    "roughness": 84.112,
+    "temp_mean": 25.063,
+    "temp_range": 57.536,
+    "precip": 106.697,
+    "ndvi": 0.083
+  },
+  {
+    "lat": -27,
+    "lon": 16.5,
+    "mars_score": 0.895,
+    "elevation": 1388.393,
+    "slope": 3.378,
+    "roughness": 117.165,
+    "temp_mean": 21.948,
+    "temp_range": 40.373,
+    "precip": 96.951,
+    "ndvi": 0.098
+  },
+  {
+    "lat": 21,
+    "lon": 16.5,
+    "mars_score": 0.887,
+    "elevation": 2297.901,
+    "slope": 5.851,
+    "roughness": 193.628,
+    "temp_mean": 25.648,
+    "temp_range": 47.417,
+    "precip": 111.676,
+    "ndvi": 0.098
+  },
+  {
+    "lat": 27,
+    "lon": 55.5,
+    "mars_score": 0.835,
+    "elevation": 460.852,
+    "slope": 8.289,
+    "roughness": 234.774,
+    "temp_mean": 32.292,
+    "temp_range": 41.0,
+    "precip": 117.813,
+    "ndvi": 0.086
+  },
+  {
+    "lat": 36,
+    "lon": 55.5,
+    "mars_score": 0.833,
+    "elevation": 1615.109,
+    "slope": 2.211,
+    "roughness": 52.197,
+    "temp_mean": 21.722,
+    "temp_range": 60.251,
+    "precip": 129.985,
+    "ndvi": 0.076
+  }
+]

@@ -1,0 +1,9 @@
+hidden_site,model,found_%,AUC
+atacama,Random Forest,20,0.96
+atacama,Logistic Regression,27,0.85
+death_valley,Random Forest,50,0.94
+death_valley,Logistic Regression,90,0.96
+dry_valleys,Random Forest,0,0.87
+dry_valleys,Logistic Regression,100,0.98
+haughton,Random Forest,51,0.96
+haughton,Logistic Regression,35,0.87
