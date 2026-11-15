@@ -1,9 +1,0 @@
-[
-  {"name": "precip", "value": 0.291},
-  {"name": "ndvi", "value": 0.235},
-  {"name": "slope", "value": 0.157},
-  {"name": "roughness", "value": 0.117},
-  {"name": "temp_range", "value": 0.075},
-  {"name": "temp_mean", "value": 0.071},
-  {"name": "elevation", "value": 0.054}
-]
